@@ -1,0 +1,9 @@
+/vendor
+/node_modules
+/public/build
+/storage/*.key
+/storage/logs
+/storage/framework/*
+/.env
+.env.*
+/docker-compose.override.yml
