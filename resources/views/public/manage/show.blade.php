@@ -60,11 +60,5 @@
         @endif
     </section>
 
-    <section class="rounded-[2rem] border border-rose-100 bg-white p-6 shadow-sm sm:p-8">
-        <h2 class="text-2xl font-semibold text-stone-900">Cancellation policy</h2>
-        <div class="prose mt-4 max-w-none text-stone-600">
-            {!! $cancellationPolicyHtml ?: '<p>Please contact us if you need to cancel or reschedule.</p>' !!}
-        </div>
-    </section>
 </div>
 @endsection
