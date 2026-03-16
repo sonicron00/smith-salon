@@ -7,6 +7,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 
 class MessagingSettings extends Page
 {
@@ -49,7 +50,7 @@ class MessagingSettings extends Page
                 ->action(function () {
                     Setting::put('sms.confirmation_template', $this->state['confirmation_template'] ?? null);
                     Setting::put('sms.reminder_template', $this->state['reminder_template'] ?? null);
-                    $this->notify('success', 'Saved.');
+                    Notification::make()->title('Saved')->success()->send();
                 }),
         ];
     }

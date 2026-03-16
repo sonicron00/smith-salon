@@ -7,6 +7,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 
 class PolicySettings extends Page
 {
@@ -40,7 +41,7 @@ class PolicySettings extends Page
                 ->label('Save')
                 ->action(function () {
                     Setting::put('policy.cancellation_html', $this->state['cancellation_html'] ?? null);
-                    $this->notify('success', 'Saved.');
+                    Notification::make()->title('Saved')->success()->send();
                 }),
         ];
     }

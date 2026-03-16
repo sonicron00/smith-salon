@@ -8,6 +8,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 
 class BrandingSettings extends Page
 {
@@ -48,7 +49,7 @@ class BrandingSettings extends Page
                 ->action(function () {
                     Setting::put('instagram.profile_url', $this->state['instagram_profile_url'] ?? null);
                     Setting::put('instagram.embed_html', $this->state['instagram_embed_html'] ?? null);
-                    $this->notify('success', 'Saved.');
+                    Notification::make()->title('Saved')->success()->send();
                 }),
         ];
     }

@@ -7,8 +7,8 @@ use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\Staff;
 use App\Services\Booking\SlotService;
-use App\Services\Messaging\TemplateRenderer;
 use App\Notifications\AppointmentBookedSms;
+use App\Support\SalonNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -79,14 +79,14 @@ class BookingController extends Controller
             ]);
         });
 
-        // Queue SMS confirmation
         try {
             $appointment->notify(new AppointmentBookedSms($appointment));
             $appointment->update(['confirmation_sent_at' => now()]);
         } catch (\Throwable $e) {
-            // Fail silently for MVP; you may log and show softer UX
             report($e);
         }
+
+        SalonNotifications::emailSalon($appointment, 'created');
 
         return redirect()->route('booking.done', ['appointment' => $appointment->id]);
     }

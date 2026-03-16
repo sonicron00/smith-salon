@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\BookingController;
 use App\Http\Controllers\Public\ManageAppointmentController;
+use App\Http\Controllers\Public\AboutController;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/about', [AboutController::class, 'index'])->name('about');
 
 Route::prefix('book')->group(function () {
     Route::get('/', [BookingController::class, 'start'])->name('booking.start');
