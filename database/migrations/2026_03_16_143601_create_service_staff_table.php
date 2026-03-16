@@ -7,19 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('time_offs', function (Blueprint $table) {
+        Schema::create('service_staff', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('service_id')->constrained()->cascadeOnDelete();
             $table->foreignId('staff_id')->constrained('staff')->cascadeOnDelete();
-            $table->dateTime('starts_at');
-            $table->dateTime('ends_at');
-            $table->string('reason')->nullable();
 
-            $table->index(['staff_id', 'starts_at', 'ends_at']);
+            $table->unique(['service_id', 'staff_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('time_off');
+        Schema::dropIfExists('service_staff');
     }
 };

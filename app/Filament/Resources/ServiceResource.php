@@ -20,6 +20,10 @@ class ServiceResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('name')->required()->maxLength(255),
+            Forms\Components\CheckboxList::make('staff')
+                ->relationship('staff', 'name')
+                ->columns(2)
+                ->label('Available with'),
             Forms\Components\TextInput::make('duration_minutes')
                 ->numeric()->required()
                 ->helperText('Must be a multiple of 10')

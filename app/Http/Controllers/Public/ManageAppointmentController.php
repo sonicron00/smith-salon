@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Services\Booking\SlotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Support\SalonNotifications;
 
 class ManageAppointmentController extends Controller
 {
@@ -37,6 +38,7 @@ class ManageAppointmentController extends Controller
         }
 
         $appointment->cancel(reason: $request->input('reason'));
+        SalonNotifications::emailSalon($appointment, 'cancelled');
 
         return back()->with('status', 'Your appointment has been cancelled.');
     }
@@ -76,6 +78,8 @@ class ManageAppointmentController extends Controller
                 'ends_at' => $endsAt,
             ]);
         });
+
+        SalonNotifications::emailSalon($appointment->fresh(['service', 'staff']), 'updated');
 
         return back()->with('status', 'Your appointment has been rescheduled.');
     }

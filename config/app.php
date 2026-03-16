@@ -2,7 +2,7 @@
 
 return [
 
-    'name' => env('APP_NAME', 'Smith Salon Booking'),
+    'name' => 'Jewel Beauty & Head Spa',
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
