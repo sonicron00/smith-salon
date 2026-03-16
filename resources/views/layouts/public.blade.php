@@ -40,7 +40,7 @@
 
     <footer class="mt-10 border-t bg-white">
         <div class="mx-auto max-w-3xl px-4 py-6 text-sm text-gray-600">
-            © {{ date('Y') }} {{ config('app.name', 'Jewel Beauty & Head Spa') }}
+            © {{ date('Y') }} {{ 'Jewel Beauty & Head Spa Limited' }}
         </div>
     </footer>
 </body>
