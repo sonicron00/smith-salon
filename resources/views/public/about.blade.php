@@ -15,6 +15,12 @@
                 We specialise in indulgent head spa rituals and refined brow and lash treatments that leave clients feeling polished, restored and confident.
             </p>
             <p>
+                Lauren specialises in brow and lash treatments, including brow waxing and tinting, brow lamination and korean lash lift.
+            </p>
+            <p>
+                Nicola specialises in head spa treatments which comprise a relaxing scalp detox and a deep conditioning treatment.
+            </p>
+            <p>
                 A beauty space specialising in brows, lashes and head spa treatments.
                 Bookings are simple, mobile friendly, and easy to manage if plans change.
             </p>

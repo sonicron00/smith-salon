@@ -23,7 +23,10 @@ class BookingController extends Controller
 
     public function pickStaff(Service $service)
     {
-        $staff = Staff::query()->where('active', true)->orderBy('name')->get();
+        $staff = $service->staff()
+            ->where('active', true)
+            ->orderBy('name')
+            ->get();
         return view('public.booking.staff', compact('service', 'staff'));
     }
 

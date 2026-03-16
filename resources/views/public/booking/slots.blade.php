@@ -6,10 +6,15 @@
     <h1 class="mt-3 text-3xl font-semibold text-stone-900">Pick a date and time</h1>
     <p class="mt-2 text-sm leading-7 text-stone-600">{{ $service->name }} with {{ $staff->name }}</p>
 
-    <form class="mt-5 rounded-[1.25rem] bg-stone-50 p-4" method="get">
-        <label class="text-sm font-medium text-stone-700">Date</label>
-        <input type="date" name="date" value="{{ $date }}" class="mt-2 w-full rounded-xl border border-rose-100 bg-white px-3 py-3" />
-        <button class="mt-3 rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-800">Change date</button>
+    <form class="mt-4" method="get" id="date-form">
+        <label class="text-sm text-gray-700">Date</label>
+        <input
+                type="date"
+                name="date"
+                value="{{ $date }}"
+                class="mt-1 w-full rounded-xl border px-3 py-2"
+                onchange="this.form.submit()"
+        />
     </form>
 
     <div class="mt-6">
