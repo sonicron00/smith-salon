@@ -20,19 +20,44 @@ class AppointmentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Select::make('staff_id')->relationship('staff', 'name')->required(),
-            Forms\Components\Select::make('service_id')->relationship('service', 'name')->required(),
-            Forms\Components\DateTimePicker::make('starts_at')->required()->seconds(false),
-            Forms\Components\DateTimePicker::make('ends_at')->required()->seconds(false),
-            Forms\Components\TextInput::make('customer_name')->required(),
-            Forms\Components\TextInput::make('customer_phone')->required(),
-            Forms\Components\TextInput::make('customer_email')->email(),
-            Forms\Components\Select::make('status')->options([
-                Appointment::STATUS_BOOKED => 'Booked',
-                Appointment::STATUS_CANCELLED => 'Cancelled',
-                Appointment::STATUS_COMPLETED => 'Completed',
-                Appointment::STATUS_NO_SHOW => 'No show',
-            ])->required(),
+            Forms\Components\Select::make('staff_id')
+                ->relationship('staff', 'name')
+                ->required(),
+
+            Forms\Components\Select::make('service_id')
+                ->relationship('service', 'name')
+                ->required(),
+
+            Forms\Components\DateTimePicker::make('starts_at')
+                ->required()
+                ->seconds(false),
+
+            Forms\Components\DateTimePicker::make('ends_at')
+                ->required()
+                ->seconds(false),
+
+            Forms\Components\TextInput::make('customer_name')
+                ->required(),
+
+            Forms\Components\TextInput::make('customer_phone')
+                ->required(),
+
+            Forms\Components\TextInput::make('customer_email')
+                ->email(),
+
+            Forms\Components\Textarea::make('customer_message')
+                ->label('Customer message')
+                ->rows(3)
+                ->columnSpanFull(),
+
+            Forms\Components\Select::make('status')
+                ->options([
+                    Appointment::STATUS_BOOKED => 'Booked',
+                    Appointment::STATUS_CANCELLED => 'Cancelled',
+                    Appointment::STATUS_COMPLETED => 'Completed',
+                    Appointment::STATUS_NO_SHOW => 'No show',
+                ])
+                ->required(),
         ])->columns(2);
     }
 
@@ -41,26 +66,48 @@ class AppointmentResource extends Resource
         return $table
             ->defaultSort('starts_at')
             ->columns([
-                Tables\Columns\TextColumn::make('starts_at')->dateTime('D j M H:i')->sortable(),
-                Tables\Columns\TextColumn::make('customer_name')->searchable(),
-                Tables\Columns\TextColumn::make('service.name')->label('Service')->searchable(),
-                Tables\Columns\TextColumn::make('staff.name')->label('Staff')->searchable(),
-                Tables\Columns\TextColumn::make('customer_phone')->label('Phone'),
-                Tables\Columns\BadgeColumn::make('status')->colors([
-                    'success' => Appointment::STATUS_BOOKED,
-                    'danger' => Appointment::STATUS_CANCELLED,
-                    'gray' => Appointment::STATUS_COMPLETED,
-                    'warning' => Appointment::STATUS_NO_SHOW,
-                ]),
+                Tables\Columns\TextColumn::make('starts_at')
+                    ->dateTime('D j M H:i')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('customer_name')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('service.name')
+                    ->label('Service')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('staff.name')
+                    ->label('Staff')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('customer_phone')
+                    ->label('Phone'),
+
+                Tables\Columns\TextColumn::make('customer_message')
+                    ->label('Message')
+                    ->limit(35)
+                    ->toggleable(),
+
+                Tables\Columns\BadgeColumn::make('status')
+                    ->colors([
+                        'success' => Appointment::STATUS_BOOKED,
+                        'danger' => Appointment::STATUS_CANCELLED,
+                        'gray' => Appointment::STATUS_COMPLETED,
+                        'warning' => Appointment::STATUS_NO_SHOW,
+                    ]),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('staff')->relationship('staff', 'name'),
-                Tables\Filters\SelectFilter::make('status')->options([
-                    Appointment::STATUS_BOOKED => 'Booked',
-                    Appointment::STATUS_CANCELLED => 'Cancelled',
-                    Appointment::STATUS_COMPLETED => 'Completed',
-                    Appointment::STATUS_NO_SHOW => 'No show',
-                ]),
+                Tables\Filters\SelectFilter::make('staff')
+                    ->relationship('staff', 'name'),
+
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        Appointment::STATUS_BOOKED => 'Booked',
+                        Appointment::STATUS_CANCELLED => 'Cancelled',
+                        Appointment::STATUS_COMPLETED => 'Completed',
+                        Appointment::STATUS_NO_SHOW => 'No show',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

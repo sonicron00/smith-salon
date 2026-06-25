@@ -23,6 +23,7 @@ class Appointment extends Model
         'customer_name',
         'customer_phone',
         'customer_email',
+        'customer_message',
         'status',
         'manage_token',
         'confirmation_sent_at',

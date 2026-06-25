@@ -19,33 +19,61 @@ class ServiceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('name')->required()->maxLength(255),
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+
             Forms\Components\CheckboxList::make('staff')
                 ->relationship('staff', 'name')
                 ->columns(2)
                 ->label('Available with'),
+
             Forms\Components\TextInput::make('duration_minutes')
-                ->numeric()->required()
+                ->numeric()
+                ->required()
                 ->helperText('Must be a multiple of 10')
                 ->rule('multiple_of:10'),
+
             Forms\Components\TextInput::make('buffer_minutes')
-                ->numeric()->default(0)
-                ->helperText('Optional buffer between appointments (multiple of 10)')
+                ->numeric()
+                ->default(0)
+                ->helperText('Optional buffer between appointments, in multiples of 10')
                 ->rule('multiple_of:10'),
+
             Forms\Components\TextInput::make('price_pence')
-                ->numeric()->default(0)
-                ->helperText('Stored in pence (e.g., 3500 for £35.00)'),
-            Forms\Components\Toggle::make('active')->default(true),
+                ->numeric()
+                ->default(0)
+                ->helperText('Stored in pence, e.g. 3500 for £35.00'),
+
+            Forms\Components\TextInput::make('sort_order')
+                ->numeric()
+                ->default(0)
+                ->helperText('Lower numbers appear first on the public booking page'),
+
+            Forms\Components\Toggle::make('active')
+                ->default(true),
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('sort_order')
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('duration_minutes')->label('Duration')->sortable(),
-                Tables\Columns\IconColumn::make('active')->boolean(),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->label('Order')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('duration_minutes')
+                    ->label('Duration')
+                    ->sortable(),
+
+                Tables\Columns\IconColumn::make('active')
+                    ->boolean(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -15,27 +15,61 @@ class TimeOffResource extends Resource
     protected static ?string $model = TimeOff::class;
     protected static ?string $navigationIcon = 'heroicon-o-no-symbol';
     protected static ?string $navigationGroup = 'Salon';
+    protected static ?string $navigationLabel = 'Blocked times';
+    protected static ?string $modelLabel = 'blocked time';
+    protected static ?string $pluralModelLabel = 'blocked times';
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Select::make('staff_id')->relationship('staff', 'name')->required(),
-            Forms\Components\DateTimePicker::make('starts_at')->required()->seconds(false),
-            Forms\Components\DateTimePicker::make('ends_at')->required()->seconds(false),
-            Forms\Components\TextInput::make('reason')->maxLength(255),
+            Forms\Components\Select::make('staff_id')
+                ->relationship('staff', 'name')
+                ->label('Therapist')
+                ->required(),
+
+            Forms\Components\DateTimePicker::make('starts_at')
+                ->label('Blocked from')
+                ->required()
+                ->seconds(false),
+
+            Forms\Components\DateTimePicker::make('ends_at')
+                ->label('Blocked until')
+                ->required()
+                ->seconds(false)
+                ->rule('after:starts_at'),
+
+            Forms\Components\TextInput::make('reason')
+                ->label('Note')
+                ->placeholder('Holiday, lunch, appointment, training...')
+                ->maxLength(255),
         ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->defaultSort('starts_at')->columns([
-            Tables\Columns\TextColumn::make('staff.name')->label('Staff'),
-            Tables\Columns\TextColumn::make('starts_at')->dateTime('D j M H:i'),
-            Tables\Columns\TextColumn::make('ends_at')->dateTime('D j M H:i'),
-            Tables\Columns\TextColumn::make('reason'),
-        ])->actions([
-            Tables\Actions\EditAction::make(),
-        ]);
+        return $table
+            ->defaultSort('starts_at')
+            ->columns([
+                Tables\Columns\TextColumn::make('staff.name')
+                    ->label('Therapist'),
+
+                Tables\Columns\TextColumn::make('starts_at')
+                    ->label('Blocked from')
+                    ->dateTime('D j M H:i'),
+
+                Tables\Columns\TextColumn::make('ends_at')
+                    ->label('Blocked until')
+                    ->dateTime('D j M H:i'),
+
+                Tables\Columns\TextColumn::make('reason')
+                    ->label('Note'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Unblock'),
+            ]);
     }
 
     public static function getPages(): array

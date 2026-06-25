@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-
 class Staff extends Model
 {
     protected $table = 'staff';
 
     protected $fillable = [
         'name',
+        'sort_order',
         'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'sort_order' => 'integer',
     ];
 
     public function workingHours(): HasMany

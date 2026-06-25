@@ -13,11 +13,13 @@ class Service extends Model
         'duration_minutes',
         'buffer_minutes',
         'price_pence',
+        'sort_order',
         'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'sort_order' => 'integer',
     ];
 
     public function appointments(): HasMany
