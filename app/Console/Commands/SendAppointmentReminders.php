@@ -30,7 +30,7 @@ class SendAppointmentReminders extends Command
 
         foreach ($appointments as $appointment) {
             try {
-                $appointment->notify(new AppointmentReminderSms($appointment));
+                (new AppointmentReminderSms($appointment))->send();
                 $appointment->update(['reminder_sent_at' => now()]);
             } catch (\Throwable $e) {
                 report($e);

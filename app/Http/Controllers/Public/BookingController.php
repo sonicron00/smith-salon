@@ -179,7 +179,7 @@ class BookingController extends Controller
         });
 
         try {
-            $appointment->notify(new AppointmentBookedSms($appointment));
+            (new AppointmentBookedSms($appointment))->send();
             $appointment->update(['confirmation_sent_at' => now()]);
         } catch (\Throwable $e) {
             report($e);

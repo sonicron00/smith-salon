@@ -47,6 +47,42 @@ services:
     networks:
       - backend
 
+  smith-salon-worker:
+    build:
+      context: .
+      dockerfile: docker/application/Dockerfile
+    container_name: smith-salon-worker
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+    depends_on:
+      - smith-salon-db
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+    restart: unless-stopped
+    networks:
+      - backend
+
+  smith-salon-scheduler:
+    build:
+      context: .
+      dockerfile: docker/application/Dockerfile
+    container_name: smith-salon-scheduler
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+    depends_on:
+      - smith-salon-db
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    restart: unless-stopped
+    networks:
+      - backend
+
 volumes:
   db_data:
 
