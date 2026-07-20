@@ -50,10 +50,9 @@ class SalonNotifications
         };
 
         try {
-            $sid = config('twilio-notification-channel.account_sid');
-            $token = config('twilio-notification-channel.auth_token');
-            $from = config('twilio-notification-channel.from')
-                ?: config('twilio-notification-channel.alphanumeric_sender');
+            $sid = env('TWILIO_ACCOUNT_SID');
+            $token = env('TWILIO_AUTH_TOKEN');
+            $from = env('TWILIO_FROM') ?: env('TWILIO_ALPHA_SENDER');
 
             if (! $from) {
                 Log::error('SalonNotifications: No TWILIO_FROM or TWILIO_ALPHA_SENDER configured.');
