@@ -19,6 +19,7 @@ class TemplateRenderer
             '{{date}}' => $appointment->starts_at->format('D j M Y'),
             '{{time}}' => $appointment->starts_at->format('H:i'),
             '{{manage_url}}' => $appointment->manageUrl(),
+            '{{consultation_url}}' => $appointment->consultationUrl(),
         ];
 
         return str_replace(array_keys($map), array_values($map), $template);

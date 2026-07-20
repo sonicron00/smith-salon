@@ -18,6 +18,7 @@ class Appointment extends Model
     protected $fillable = [
         'staff_id',
         'service_id',
+        'customer_id',
         'starts_at',
         'ends_at',
         'customer_name',
@@ -50,6 +51,16 @@ class Appointment extends Model
         return $this->belongsTo(Service::class);
     }
 
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function consultationResponse(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ConsultationResponse::class);
+    }
+
     public function routeNotificationForTwilio(): string
     {
         return $this->customer_phone;
@@ -58,6 +69,11 @@ class Appointment extends Model
     public function manageUrl(): string
     {
         return route('appointment.manage', ['token' => $this->manage_token]);
+    }
+
+    public function consultationUrl(): string
+    {
+        return route('appointment.consultation', ['token' => $this->manage_token]);
     }
 
     public function canModify(int $cutoffHours): bool

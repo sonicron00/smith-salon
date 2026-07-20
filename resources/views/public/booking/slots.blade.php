@@ -16,21 +16,29 @@
 
         <section class="mt-6 rounded-[1.5rem] border border-rose-100 bg-stone-50 p-4">
             <div class="flex items-center justify-between gap-3">
-                <a
-                        href="{{ route('booking.slots', ['service' => $service->id, 'staff' => $staff->id, 'month' => $calendar['previous_month'], 'date' => $calendar['previous_month'] . '-01']) }}"
-                        class="rounded-full border border-rose-200 bg-white px-3 py-1 text-sm font-medium text-rose-800"
-                >
-                    ←
-                </a>
+                @if ($calendar['previous_month'])
+                    <a
+                            href="{{ route('booking.slots', ['service' => $service->id, 'staff' => $staff->id, 'month' => $calendar['previous_month'], 'date' => $calendar['previous_month'] . '-01']) }}"
+                            class="rounded-full border border-rose-200 bg-white px-3 py-1 text-sm font-medium text-rose-800"
+                    >
+                        ←
+                    </a>
+                @else
+                    <span class="px-3 py-1"></span>
+                @endif
 
                 <div class="text-sm font-semibold text-stone-900">{{ $calendar['label'] }}</div>
 
-                <a
-                        href="{{ route('booking.slots', ['service' => $service->id, 'staff' => $staff->id, 'month' => $calendar['next_month'], 'date' => $calendar['next_month'] . '-01']) }}"
-                        class="rounded-full border border-rose-200 bg-white px-3 py-1 text-sm font-medium text-rose-800"
-                >
-                    →
-                </a>
+                @if ($calendar['next_month'])
+                    <a
+                            href="{{ route('booking.slots', ['service' => $service->id, 'staff' => $staff->id, 'month' => $calendar['next_month'], 'date' => $calendar['next_month'] . '-01']) }}"
+                            class="rounded-full border border-rose-200 bg-white px-3 py-1 text-sm font-medium text-rose-800"
+                    >
+                        →
+                    </a>
+                @else
+                    <span class="px-3 py-1"></span>
+                @endif
             </div>
 
             <div class="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-semibold uppercase tracking-wide text-stone-500">
@@ -83,6 +91,8 @@
                     type="date"
                     name="date"
                     value="{{ $date }}"
+                    min="{{ now()->addHours(24)->format('Y-m-d') }}"
+                    max="{{ now()->addWeeks(6)->format('Y-m-d') }}"
                     class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3"
                     onchange="this.form.submit()"
             />
@@ -108,6 +118,10 @@
                             No upcoming slots were found. Please try another therapist or treatment.
                         </div>
                     @endif
+
+                    <p class="mt-3 text-sm leading-6 text-stone-600">
+                        If you don't see a booking that suits please message us and we'll do our best to accommodate you.
+                    </p>
                 </div>
             @else
                 @foreach ($slotGroups as $period => $periodSlots)

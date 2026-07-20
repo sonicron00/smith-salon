@@ -9,13 +9,35 @@ use Carbon\CarbonImmutable;
 
 class SlotService
 {
+    /** Minimum hours in advance a slot can be booked. */
+    private const MIN_ADVANCE_HOURS = 24;
+
+    /** Maximum weeks in advance a slot can be booked. */
+    private const MAX_ADVANCE_WEEKS = 6;
+
+    /** Slot granularity in minutes (on the hour and half hour). */
+    private const SLOT_INTERVAL = 30;
+
     /**
-     * Return available slot start times, e.g. ["10:00", "10:10"].
-     * Uses 10-minute granularity.
+     * Return available slot start times, e.g. ["10:00", "10:30"].
+     * Uses 30-minute granularity (on the hour and half hour).
      */
     public function availableSlots(Service $service, Staff $staff, string $date, ?int $ignoreAppointmentId = null): array
     {
         $day = CarbonImmutable::parse($date)->startOfDay();
+        $now = CarbonImmutable::now();
+
+        // Don't return slots for dates in the past
+        if ($day->lt($now->startOfDay())) {
+            return [];
+        }
+
+        // Don't return slots beyond the max advance window
+        $maxDate = $now->addWeeks(self::MAX_ADVANCE_WEEKS)->endOfDay();
+        if ($day->gt($maxDate)) {
+            return [];
+        }
+
         $weekday = (int) $day->dayOfWeekIso - 1; // 0=Mon
 
         $hours = $staff->workingHours()->where('weekday', $weekday)->first();
@@ -34,6 +56,11 @@ class SlotService
             ->where('starts_at', '<', $end)
             ->where('ends_at', '>', $start)
             ->get(['starts_at', 'ends_at']);
+
+        // Also consider recurring blocked times
+        $recurringTimeOff = $staff->timeOff()
+            ->where('is_recurring', true)
+            ->get();
 
         $existing = Appointment::query()
             ->where('staff_id', $staff->id)
@@ -59,13 +86,27 @@ class SlotService
             ];
         }
 
+        // Apply recurring blocks to this specific day
+        foreach ($recurringTimeOff as $recurring) {
+            $recurringStart = CarbonImmutable::parse($recurring->starts_at);
+            $recurringEnd = CarbonImmutable::parse($recurring->ends_at);
+            $recurringWeekday = (int) $recurringStart->dayOfWeekIso - 1;
+
+            if ($recurringWeekday === $weekday) {
+                $blockStart = $day->setTimeFromTimeString($recurringStart->format('H:i:s'));
+                $blockEnd = $day->setTimeFromTimeString($recurringEnd->format('H:i:s'));
+                $blockedRanges[] = [$blockStart, $blockEnd];
+            }
+        }
+
         $slots = [];
-        $cursor = $this->ceilToTenMinutes($start);
+        $cursor = $this->ceilToHalfHour($start);
 
-        $now = CarbonImmutable::now();
+        // Enforce 24-hour minimum advance booking
+        $earliestBookable = $now->addHours(self::MIN_ADVANCE_HOURS);
 
-        if ($day->isSameDay($now) && $cursor->lt($now)) {
-            $cursor = $this->ceilToTenMinutes($now);
+        if ($cursor->lt($earliestBookable)) {
+            $cursor = $this->ceilToHalfHour($earliestBookable);
         }
 
         while ($cursor->addMinutes($duration)->lte($end)) {
@@ -76,7 +117,7 @@ class SlotService
                 $slots[] = $slotStart->format('H:i');
             }
 
-            $cursor = $cursor->addMinutes(10);
+            $cursor = $cursor->addMinutes(self::SLOT_INTERVAL);
         }
 
         return $slots;
@@ -85,7 +126,7 @@ class SlotService
     public function slotToRange(Service $service, string $date, string $time): array
     {
         $start = CarbonImmutable::parse($date . ' ' . $time);
-        $start = $this->ceilToTenMinutes($start);
+        $start = $this->ceilToHalfHour($start);
         $end = $start->addMinutes((int) $service->duration_minutes);
 
         return [$start, $end];
@@ -100,10 +141,22 @@ class SlotService
         $monthStart = CarbonImmutable::parse($month . '-01')->startOfMonth();
         $monthEnd = $monthStart->endOfMonth();
 
-        $dates = [];
-        $cursor = $monthStart;
+        $now = CarbonImmutable::now();
+        $earliest = $now->addHours(self::MIN_ADVANCE_HOURS)->startOfDay();
+        $latest = $now->addWeeks(self::MAX_ADVANCE_WEEKS)->endOfDay();
 
-        while ($cursor->lte($monthEnd)) {
+        // Clamp the range to the bookable window
+        $start = $monthStart->lt($earliest) ? $earliest : $monthStart;
+        $end = $monthEnd->gt($latest) ? $latest : $monthEnd;
+
+        if ($start->gt($end)) {
+            return [];
+        }
+
+        $dates = [];
+        $cursor = $start;
+
+        while ($cursor->lte($end)) {
             $date = $cursor->toDateString();
 
             if (! empty($this->availableSlots($service, $staff, $date, $ignoreAppointmentId))) {
@@ -120,15 +173,19 @@ class SlotService
         Service $service,
         Staff $staff,
         string $fromDate,
-        int $daysToSearch = 90,
         ?int $ignoreAppointmentId = null
     ): ?array {
-        $start = CarbonImmutable::parse($fromDate)->startOfDay();
-        $today = CarbonImmutable::today();
+        $now = CarbonImmutable::now();
+        $earliest = $now->addHours(self::MIN_ADVANCE_HOURS)->startOfDay();
+        $latest = $now->addWeeks(self::MAX_ADVANCE_WEEKS)->endOfDay();
 
-        if ($start->lt($today)) {
-            $start = $today;
+        $start = CarbonImmutable::parse($fromDate)->startOfDay();
+
+        if ($start->lt($earliest)) {
+            $start = $earliest;
         }
+
+        $daysToSearch = (int) $start->diffInDays($latest);
 
         for ($i = 0; $i <= $daysToSearch; $i++) {
             $date = $start->addDays($i)->toDateString();
@@ -158,15 +215,15 @@ class SlotService
         return false;
     }
 
-    private function ceilToTenMinutes(CarbonImmutable $dateTime): CarbonImmutable
+    private function ceilToHalfHour(CarbonImmutable $dateTime): CarbonImmutable
     {
         $minute = (int) $dateTime->minute;
-        $remainder = $minute % 10;
+        $remainder = $minute % 30;
 
         if ($remainder === 0) {
             return $dateTime->second(0);
         }
 
-        return $dateTime->addMinutes(10 - $remainder)->second(0);
+        return $dateTime->addMinutes(30 - $remainder)->second(0);
     }
 }

@@ -17,6 +17,11 @@ Route::prefix('book')->group(function () {
     Route::get('/done/{appointment}', [BookingController::class, 'done'])->name('booking.done');
 });
 
+use App\Http\Controllers\Public\ConsultationFormController;
+
 Route::get('/a/{token}', [ManageAppointmentController::class, 'show'])->name('appointment.manage');
 Route::post('/a/{token}/cancel', [ManageAppointmentController::class, 'cancel'])->name('appointment.cancel');
 Route::post('/a/{token}/reschedule', [ManageAppointmentController::class, 'reschedule'])->name('appointment.reschedule');
+
+Route::get('/a/{token}/consultation', [ConsultationFormController::class, 'show'])->name('appointment.consultation');
+Route::post('/a/{token}/consultation', [ConsultationFormController::class, 'submit'])->name('appointment.consultation.submit');

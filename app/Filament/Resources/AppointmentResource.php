@@ -110,6 +110,14 @@ class AppointmentResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Consultation')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->visible(fn (Appointment $record) => $record->consultationResponse !== null)
+                    ->modalHeading('Consultation Form Responses')
+                    ->modalContent(fn (Appointment $record) => view('filament.pages.consultation-response', [
+                        'appointment' => $record->load('consultationResponse.form'),
+                    ])),
                 Tables\Actions\EditAction::make(),
             ]);
     }

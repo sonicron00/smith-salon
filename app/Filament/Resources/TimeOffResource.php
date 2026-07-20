@@ -43,6 +43,11 @@ class TimeOffResource extends Resource
                 ->label('Note')
                 ->placeholder('Holiday, lunch, appointment, training...')
                 ->maxLength(255),
+
+            Forms\Components\Toggle::make('is_recurring')
+                ->label('Recurring weekly')
+                ->helperText('Block repeats on the same weekday and time every week until turned off')
+                ->default(false),
         ]);
     }
 
@@ -64,6 +69,10 @@ class TimeOffResource extends Resource
 
                 Tables\Columns\TextColumn::make('reason')
                     ->label('Note'),
+
+                Tables\Columns\IconColumn::make('is_recurring')
+                    ->label('Recurring')
+                    ->boolean(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

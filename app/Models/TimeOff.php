@@ -14,11 +14,13 @@ class TimeOff extends Model
         'starts_at',
         'ends_at',
         'reason',
+        'is_recurring',
     ];
 
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'is_recurring' => 'boolean',
     ];
 
     public function staff(): BelongsTo

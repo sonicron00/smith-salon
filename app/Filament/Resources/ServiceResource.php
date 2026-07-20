@@ -31,14 +31,14 @@ class ServiceResource extends Resource
             Forms\Components\TextInput::make('duration_minutes')
                 ->numeric()
                 ->required()
-                ->helperText('Must be a multiple of 10')
-                ->rule('multiple_of:10'),
+                ->helperText('Must be a multiple of 30')
+                ->rule('multiple_of:30'),
 
             Forms\Components\TextInput::make('buffer_minutes')
                 ->numeric()
                 ->default(0)
-                ->helperText('Optional buffer between appointments, in multiples of 10')
-                ->rule('multiple_of:10'),
+                ->helperText('Optional buffer between appointments, in multiples of 30')
+                ->rule('multiple_of:30'),
 
             Forms\Components\TextInput::make('price_pence')
                 ->numeric()
@@ -52,6 +52,12 @@ class ServiceResource extends Resource
 
             Forms\Components\Toggle::make('active')
                 ->default(true),
+
+            Forms\Components\Select::make('consultation_form_id')
+                ->relationship('consultationForm', 'name')
+                ->label('Consultation form')
+                ->helperText('Customers will be asked to complete this form before their appointment')
+                ->nullable(),
         ]);
     }
 

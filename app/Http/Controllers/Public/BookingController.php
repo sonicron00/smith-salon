@@ -45,8 +45,35 @@ class BookingController extends Controller
             abort(404);
         }
 
-        $date = $request->query('date') ?: now()->toDateString();
+        $now = CarbonImmutable::now();
+        $earliest = $now->addHours(24)->startOfDay();
+        $latest = $now->addWeeks(6)->endOfDay();
+
+        // Default to the first bookable day (tomorrow at earliest)
+        $date = $request->query('date') ?: $earliest->toDateString();
+
+        // Clamp date to bookable window
+        $parsedDate = CarbonImmutable::parse($date);
+        if ($parsedDate->lt($earliest)) {
+            $date = $earliest->toDateString();
+        } elseif ($parsedDate->gt($latest)) {
+            $date = $latest->toDateString();
+        }
+
         $month = $this->normaliseMonth($request->query('month'), $date);
+
+        // Clamp month navigation to bookable window
+        $monthStart = CarbonImmutable::parse($month . '-01')->startOfMonth();
+        $earliestMonth = $earliest->format('Y-m');
+        $latestMonth = $latest->format('Y-m');
+
+        if ($month < $earliestMonth) {
+            $month = $earliestMonth;
+            $monthStart = CarbonImmutable::parse($month . '-01')->startOfMonth();
+        } elseif ($month > $latestMonth) {
+            $month = $latestMonth;
+            $monthStart = CarbonImmutable::parse($month . '-01')->startOfMonth();
+        }
 
         $slots = $slotService->availableSlots($service, $staff, $date);
 
@@ -58,13 +85,14 @@ class BookingController extends Controller
         $availableDates = $slotService->availableDatesForMonth($service, $staff, $month);
         $calendarWeeks = $this->buildCalendarWeeks($month, $availableDates, $date);
 
-        $monthStart = CarbonImmutable::parse($month . '-01')->startOfMonth();
+        $previousMonth = $monthStart->subMonth()->format('Y-m');
+        $nextMonth = $monthStart->addMonth()->format('Y-m');
 
         $calendar = [
             'month' => $month,
             'label' => $monthStart->format('F Y'),
-            'previous_month' => $monthStart->subMonth()->format('Y-m'),
-            'next_month' => $monthStart->addMonth()->format('Y-m'),
+            'previous_month' => $previousMonth >= $earliestMonth ? $previousMonth : null,
+            'next_month' => $nextMonth <= $latestMonth ? $nextMonth : null,
             'weeks' => $calendarWeeks,
         ];
 
@@ -126,9 +154,16 @@ class BookingController extends Controller
                 abort(409, 'That time has just been booked. Please choose another slot.');
             }
 
+            $customer = \App\Models\Customer::findOrCreateFromBooking(
+                $validated['customer_name'],
+                $validated['customer_phone'],
+                $validated['customer_email'] ?? null,
+            );
+
             return Appointment::create([
                 'staff_id' => $staff->id,
                 'service_id' => $service->id,
+                'customer_id' => $customer->id,
                 'starts_at' => $startsAt,
                 'ends_at' => $endsAt,
                 'customer_name' => $validated['customer_name'],

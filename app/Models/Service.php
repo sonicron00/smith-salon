@@ -15,6 +15,7 @@ class Service extends Model
         'price_pence',
         'sort_order',
         'active',
+        'consultation_form_id',
     ];
 
     protected $casts = [
@@ -30,5 +31,10 @@ class Service extends Model
     public function staff(): BelongsToMany
     {
         return $this->belongsToMany(Staff::class, 'service_staff');
+    }
+
+    public function consultationForm(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ConsultationForm::class);
     }
 }
