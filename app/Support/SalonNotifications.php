@@ -16,7 +16,7 @@ class SalonNotifications
         $salonPhone = config('salon.notification_phone');
 
         if (! $salonPhone) {
-            Log::warning('SalonNotifications: No salon notification phone configured.');
+            Log::warning('SalonNotifications: No salon notification phone configured (SALON_NOTIFICATION_PHONE).');
             return;
         }
 
@@ -50,9 +50,10 @@ class SalonNotifications
         };
 
         try {
-            $sid = env('TWILIO_ACCOUNT_SID');
-            $token = env('TWILIO_AUTH_TOKEN');
-            $from = env('TWILIO_FROM') ?: env('TWILIO_ALPHA_SENDER');
+            $sid = config('twilio-notification-channel.account_sid');
+            $token = config('twilio-notification-channel.auth_token');
+            $from = config('twilio-notification-channel.from')
+                ?: config('twilio-notification-channel.alphanumeric_sender');
 
             if (! $from) {
                 Log::error('SalonNotifications: No TWILIO_FROM or TWILIO_ALPHA_SENDER configured.');
