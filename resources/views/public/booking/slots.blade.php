@@ -181,7 +181,7 @@
                                 name="customer_phone"
                                 value="{{ old('customer_phone') }}"
                                 class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3"
-                                placeholder="+447..."
+                                placeholder="07956 ..."
                                 required
                         />
                     </div>

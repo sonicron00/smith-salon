@@ -127,6 +127,9 @@ class BookingController extends Controller
         $service = Service::findOrFail($validated['service_id']);
         $staff = Staff::findOrFail($validated['staff_id']);
 
+        // Normalise UK phone number to E.164 format
+        $validated['customer_phone'] = self::normalisePhone($validated['customer_phone']);
+
         if (! $service->staff()->whereKey($staff->id)->exists()) {
             abort(404);
         }
@@ -233,5 +236,33 @@ class BookingController extends Controller
         }
 
         return $weeks;
+    }
+
+    /**
+     * Normalise a UK phone number to E.164 format.
+     * Converts 07xxx, 7xxx to +447xxx. Leaves already-international numbers alone.
+     */
+    private static function normalisePhone(string $phone): string
+    {
+        // Strip spaces, dashes, brackets
+        $phone = preg_replace('/[\s\-\(\)]+/', '', $phone);
+
+        // 07xxxxxxxxx → +447xxxxxxxxx
+        if (preg_match('/^0(\d{10})$/', $phone, $matches)) {
+            return '+44' . $matches[1];
+        }
+
+        // 447xxxxxxxxx (missing +) → +447xxxxxxxxx
+        if (preg_match('/^44(\d{10})$/', $phone, $matches)) {
+            return '+44' . $matches[1];
+        }
+
+        // Already has + prefix, return as-is
+        if (str_starts_with($phone, '+')) {
+            return $phone;
+        }
+
+        // Fallback: return as-is
+        return $phone;
     }
 }
