@@ -38,7 +38,7 @@ class ManageAppointmentController extends Controller
         }
 
         $appointment->cancel(reason: $request->input('reason'));
-        SalonNotifications::emailSalon($appointment, 'cancelled');
+        SalonNotifications::smsSalon($appointment, 'cancelled');
 
         return back()->with('status', 'Your appointment has been cancelled.');
     }
@@ -79,7 +79,7 @@ class ManageAppointmentController extends Controller
             ]);
         });
 
-        SalonNotifications::emailSalon($appointment->fresh(['service', 'staff']), 'updated');
+        SalonNotifications::smsSalon($appointment->fresh(['service', 'staff']), 'updated');
 
         return back()->with('status', 'Your appointment has been rescheduled.');
     }

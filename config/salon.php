@@ -4,6 +4,7 @@ return [
     'cancellation_cutoff_hours' => (int) env('CANCELLATION_CUTOFF_HOURS', 24),
     'reminder_lead_minutes' => (int) env('REMINDER_LEAD_MINUTES', 1440),
     'notification_email' => env('SALON_NOTIFICATION_EMAIL'),
+    'notification_phone' => env('SALON_NOTIFICATION_PHONE'),
 
     // Confirm this address with the client if needed.
     'address' => env('SALON_ADDRESS', '15 Trinity Square, South Woodham Ferrers, Chelmsford CM3 5JX'),

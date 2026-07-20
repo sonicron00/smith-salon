@@ -182,7 +182,7 @@ class BookingController extends Controller
             report($e);
         }
 
-        SalonNotifications::emailSalon($appointment, 'created');
+        SalonNotifications::smsSalon($appointment, 'created');
 
         return redirect()->route('booking.done', ['appointment' => $appointment->id]);
     }
