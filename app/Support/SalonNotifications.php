@@ -52,7 +52,13 @@ class SalonNotifications
         try {
             $sid = config('twilio-notification-channel.account_sid');
             $token = config('twilio-notification-channel.auth_token');
-            $from = config('twilio-notification-channel.from');
+            $from = config('twilio-notification-channel.from')
+                ?: config('twilio-notification-channel.alphanumeric_sender');
+
+            if (! $from) {
+                Log::error('SalonNotifications: No TWILIO_FROM or TWILIO_ALPHA_SENDER configured.');
+                return;
+            }
 
             $client = new Client($sid, $token);
             $client->messages->create($salonPhone, [
