@@ -14,7 +14,8 @@ class SendAppointmentReminders extends Command
 
     public function handle(): int
     {
-        $leadMinutes = (int) (config('salon.reminder_lead_minutes') ?? 1440);
+        $leadHours = (int) (\App\Models\Setting::get('sms.reminder_lead_hours') ?? 24);
+        $leadMinutes = $leadHours * 60;
 
         $windowStart = now()->addMinutes($leadMinutes)->subMinutes(5);
         $windowEnd = now()->addMinutes($leadMinutes)->addMinutes(5);
