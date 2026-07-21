@@ -63,6 +63,10 @@ class ConsultationFormController extends Controller
                 $fieldRules[] = 'max:2000';
             }
 
+            if ($field['type'] === 'date') {
+                $fieldRules[] = 'date';
+            }
+
             if ($field['type'] === 'select') {
                 $fieldRules[] = 'string';
             }

@@ -48,6 +48,14 @@
                             class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3"
                             {{ ($field['required'] ?? false) ? 'required' : '' }}
                         />
+                    @elseif ($field['type'] === 'date')
+                        <input
+                            name="answers[{{ $index }}]"
+                            type="date"
+                            value="{{ old("answers.{$index}") }}"
+                            class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3"
+                            {{ ($field['required'] ?? false) ? 'required' : '' }}
+                        />
                     @elseif ($field['type'] === 'textarea')
                         <textarea
                             name="answers[{{ $index }}]"

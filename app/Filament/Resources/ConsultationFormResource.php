@@ -41,6 +41,7 @@ class ConsultationFormResource extends Resource
                         ->options([
                             'text' => 'Short text',
                             'textarea' => 'Long text',
+                            'date' => 'Date',
                             'select' => 'Dropdown',
                             'checkbox' => 'Checkbox (yes/no)',
                             'radio' => 'Multiple choice',
