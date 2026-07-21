@@ -77,7 +77,7 @@ class ConsultationFormResource extends Resource
 
                 Tables\Columns\TextColumn::make('fields')
                     ->label('Fields')
-                    ->formatStateUsing(fn ($state) => is_array($state) ? count($state) . ' fields' : '0 fields'),
+                    ->formatStateUsing(fn ($record) => count($record->fields ?? []) . ' fields'),
 
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
