@@ -9,11 +9,6 @@
         <span class="font-semibold text-stone-900">{{ $appointment->starts_at->format('D j M Y \a\t H:i') }}</span>
     </p>
 
-    <div class="mt-6 rounded-[1.25rem] bg-stone-50 p-4 text-left">
-        <div class="text-sm text-stone-700">Manage your appointment:</div>
-        <a class="mt-2 inline-block break-all text-sm font-medium text-rose-700 underline" href="{{ $appointment->manageUrl() }}">{{ $appointment->manageUrl() }}</a>
-    </div>
-
     <div class="mt-6 flex justify-center gap-3">
         <a href="{{ route('landing') }}" class="rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-800">Back to home</a>
         <a href="{{ route('booking.start') }}" class="rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white">Book another</a>

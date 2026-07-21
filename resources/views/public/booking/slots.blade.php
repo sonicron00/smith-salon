@@ -211,7 +211,8 @@
                     </button>
 
                     <p class="text-xs leading-6 text-stone-500">
-                        You’ll receive a text confirmation with a link to manage your appointment.
+                        You'll receive a text confirmation of this booking, with a link to a form to complete if this is your first time.
+                        You'll also receive a follow up text reminder {{ \App\Models\Setting::get('sms.reminder_lead_hours', '24') }} hours before your appointment.
                     </p>
                 </form>
             </div>

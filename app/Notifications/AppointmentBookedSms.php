@@ -18,6 +18,12 @@ class AppointmentBookedSms
             ?? "Hi {{name}}, you're booked for {{service}} with {{staff}} on {{date}} at {{time}}. Manage: {{manage_url}}";
 
         $body = app(TemplateRenderer::class)->render($template, $this->appointment);
+
+        // Append consultation form link for new customers on this service
+        if ($this->appointment->needsConsultationForm()) {
+            $body .= "\n\nPlease complete your consultation form before your appointment: " . $this->appointment->consultationUrl();
+        }
+
         $to = $this->appointment->customer_phone;
 
         $sid = config('twilio-notification-channel.account_sid');
