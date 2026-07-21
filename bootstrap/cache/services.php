@@ -42,8 +42,9 @@
     38 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     39 => 'Termwind\\Laravel\\TermwindServiceProvider',
     40 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
-    41 => 'App\\Providers\\AppServiceProvider',
-    42 => 'App\\Providers\\Filament\\AdminPanelProvider',
+    41 => 'Saade\\FilamentFullCalendar\\FilamentFullCalendarServiceProvider',
+    42 => 'App\\Providers\\AppServiceProvider',
+    43 => 'App\\Providers\\Filament\\AdminPanelProvider',
   ),
   'eager' => 
   array (
@@ -73,8 +74,9 @@
     23 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     24 => 'Termwind\\Laravel\\TermwindServiceProvider',
     25 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
-    26 => 'App\\Providers\\AppServiceProvider',
-    27 => 'App\\Providers\\Filament\\AdminPanelProvider',
+    26 => 'Saade\\FilamentFullCalendar\\FilamentFullCalendarServiceProvider',
+    27 => 'App\\Providers\\AppServiceProvider',
+    28 => 'App\\Providers\\Filament\\AdminPanelProvider',
   ),
   'deferred' => 
   array (
