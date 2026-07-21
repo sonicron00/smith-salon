@@ -83,9 +83,23 @@ class ConsultationFormController extends Controller
         ConsultationResponse::create([
             'appointment_id' => $appointment->id,
             'consultation_form_id' => $form->id,
-            'answers' => $validated['answers'] ?? [],
+            'answers' => $this->mergeOtherAnswers($form, $validated['answers'] ?? [], $request->input('answers_other', [])),
         ]);
 
         return back()->with('status', 'Thank you! Your consultation form has been submitted.');
+    }
+
+    /**
+     * If a field has "other_options" and the customer selected one, append their free-text to the answer.
+     */
+    private function mergeOtherAnswers($form, array $answers, array $otherAnswers): array
+    {
+        foreach ($form->fields as $index => $field) {
+            if (! empty($field['other_options']) && ! empty($otherAnswers[$index])) {
+                $answers[$index] = ($answers[$index] ?? '') . ': ' . $otherAnswers[$index];
+            }
+        }
+
+        return $answers;
     }
 }

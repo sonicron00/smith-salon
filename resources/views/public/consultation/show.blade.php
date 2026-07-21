@@ -68,21 +68,44 @@
                             name="answers[{{ $index }}]"
                             class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3"
                             {{ ($field['required'] ?? false) ? 'required' : '' }}
+                            onchange="toggleOther(this, {{ $index }})"
                         >
                             <option value="">— Select —</option>
                             @foreach ($field['options'] ?? [] as $option)
                                 <option value="{{ $option }}" {{ old("answers.{$index}") === $option ? 'selected' : '' }}>{{ $option }}</option>
                             @endforeach
                         </select>
+                        @if (!empty($field['other_options']))
+                            <input
+                                name="answers_other[{{ $index }}]"
+                                type="text"
+                                id="other-{{ $index }}"
+                                value="{{ old("answers_other.{$index}") }}"
+                                placeholder="Please specify..."
+                                class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3 hidden"
+                                data-other-options="{{ implode(',', $field['other_options']) }}"
+                            />
+                        @endif
                     @elseif ($field['type'] === 'radio')
                         <div class="mt-2 space-y-2">
                             @foreach ($field['options'] ?? [] as $option)
                                 <label class="flex items-center gap-2 text-sm text-stone-700">
-                                    <input type="radio" name="answers[{{ $index }}]" value="{{ $option }}" {{ old("answers.{$index}") === $option ? 'checked' : '' }} />
+                                    <input type="radio" name="answers[{{ $index }}]" value="{{ $option }}" {{ old("answers.{$index}") === $option ? 'checked' : '' }} onchange="toggleOther(this, {{ $index }})" />
                                     {{ $option }}
                                 </label>
                             @endforeach
                         </div>
+                        @if (!empty($field['other_options']))
+                            <input
+                                name="answers_other[{{ $index }}]"
+                                type="text"
+                                id="other-{{ $index }}"
+                                value="{{ old("answers_other.{$index}") }}"
+                                placeholder="Please specify..."
+                                class="mt-2 w-full rounded-xl border border-rose-100 px-3 py-3 hidden"
+                                data-other-options="{{ implode(',', $field['other_options']) }}"
+                            />
+                        @endif
                     @elseif ($field['type'] === 'checkbox')
                         <div class="mt-2">
                             <input type="hidden" name="answers[{{ $index }}]" value="0" />
@@ -99,6 +122,23 @@
                 Submit form
             </button>
         </form>
+
+        <script>
+            function toggleOther(el, index) {
+                const otherInput = document.getElementById('other-' + index);
+                if (!otherInput) return;
+
+                const otherOptions = otherInput.dataset.otherOptions.split(',');
+                const selectedValue = el.type === 'radio' ? el.value : el.value;
+
+                if (otherOptions.includes(selectedValue)) {
+                    otherInput.classList.remove('hidden');
+                } else {
+                    otherInput.classList.add('hidden');
+                    otherInput.value = '';
+                }
+            }
+        </script>
     @endif
 </div>
 @endsection

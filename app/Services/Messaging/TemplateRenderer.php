@@ -12,6 +12,10 @@ class TemplateRenderer
      */
     public function render(string $template, Appointment $appointment): string
     {
+        $consultationUrl = $appointment->needsConsultationForm()
+            ? $appointment->consultationUrl()
+            : '';
+
         $map = [
             '{{name}}' => $appointment->customer_name,
             '{{service}}' => $appointment->service?->name ?? '',
@@ -19,7 +23,7 @@ class TemplateRenderer
             '{{date}}' => $appointment->starts_at->format('D j M Y'),
             '{{time}}' => $appointment->starts_at->format('H:i'),
             '{{manage_url}}' => $appointment->manageUrl(),
-            '{{consultation_url}}' => $appointment->consultationUrl(),
+            '{{consultation_url}}' => $consultationUrl,
         ];
 
         return str_replace(array_keys($map), array_values($map), $template);

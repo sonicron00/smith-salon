@@ -76,6 +76,30 @@ class Appointment extends Model
         return route('appointment.consultation', ['token' => $this->manage_token]);
     }
 
+    /**
+     * Whether this appointment needs a consultation form.
+     * Only true if the service has a form AND the customer hasn't completed one for this service before.
+     */
+    public function needsConsultationForm(): bool
+    {
+        $form = $this->service?->consultationForm;
+
+        if (! $form) {
+            return false;
+        }
+
+        // Check if this customer has already submitted a response for this service's form
+        $previousResponse = ConsultationResponse::query()
+            ->where('consultation_form_id', $form->id)
+            ->whereHas('appointment', function ($query) {
+                $query->where('customer_phone', $this->customer_phone)
+                    ->where('id', '!=', $this->id);
+            })
+            ->exists();
+
+        return ! $previousResponse;
+    }
+
     public function canModify(int $cutoffHours): bool
     {
         return now()->diffInHours($this->starts_at, false) >= $cutoffHours

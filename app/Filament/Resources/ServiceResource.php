@@ -30,15 +30,12 @@ class ServiceResource extends Resource
 
             Forms\Components\TextInput::make('duration_minutes')
                 ->numeric()
-                ->required()
-                ->helperText('Must be a multiple of 30')
-                ->rule('multiple_of:30'),
+                ->required(),
 
             Forms\Components\TextInput::make('buffer_minutes')
                 ->numeric()
                 ->default(0)
-                ->helperText('Optional buffer between appointments, in multiples of 30')
-                ->rule('multiple_of:30'),
+                ->helperText('Optional buffer between appointments'),
 
             Forms\Components\TextInput::make('price_pence')
                 ->numeric()

@@ -38,6 +38,7 @@ class ConsultationFormResource extends Resource
 
                     Forms\Components\Select::make('type')
                         ->required()
+                        ->live()
                         ->options([
                             'text' => 'Short text',
                             'textarea' => 'Long text',
@@ -49,6 +50,11 @@ class ConsultationFormResource extends Resource
 
                     Forms\Components\TagsInput::make('options')
                         ->helperText('Options for dropdown or multiple choice fields')
+                        ->visible(fn (Forms\Get $get) => in_array($get('type'), ['select', 'radio'])),
+
+                    Forms\Components\TagsInput::make('other_options')
+                        ->label('Options that show a text field')
+                        ->helperText('If the customer picks one of these options, a free-text box appears (e.g. "Other")')
                         ->visible(fn (Forms\Get $get) => in_array($get('type'), ['select', 'radio'])),
 
                     Forms\Components\Toggle::make('required')
