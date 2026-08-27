@@ -13,7 +13,8 @@ class LandingController extends Controller
         $instagramEmbedHtml  = Setting::get('instagram.embed_html');
 
         $cancellationPolicyHtml = Setting::get('policy.cancellation_html');
+        $reviewsEmbedHtml = Setting::get('reviews.embed_html');
 
-        return view('public.landing', compact('instagramProfileUrl', 'instagramEmbedHtml', 'cancellationPolicyHtml'));
+        return view('public.landing', compact('instagramProfileUrl', 'instagramEmbedHtml', 'cancellationPolicyHtml', 'reviewsEmbedHtml'));
     }
 }

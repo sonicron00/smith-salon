@@ -52,6 +52,15 @@
         </div> -->
     </section>
 
+    @if (!empty($reviewsEmbedHtml))
+        <section class="rounded-[1.75rem] border border-rose-100 bg-white p-6 shadow-sm sm:p-8">
+            <h2 class="text-2xl font-semibold text-stone-900">What our clients say</h2>
+            <div class="mt-4">
+                {!! $reviewsEmbedHtml !!}
+            </div>
+        </section>
+    @endif
+
     <section class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
         <div class="rounded-[1.75rem] border border-rose-100 bg-white p-6 shadow-sm">
             <h2 class="text-2xl font-semibold text-stone-900">Visit us</h2>
