@@ -6,6 +6,9 @@ return [
     'notification_email' => env('SALON_NOTIFICATION_EMAIL'),
     'notification_phone' => env('SALON_NOTIFICATION_PHONE'),
 
+    'google_api_key' => env('GOOGLE_API_KEY'),
+    'google_place_id' => env('GOOGLE_PLACE_ID'),
+
     // Confirm this address with the client if needed.
     'address' => env('SALON_ADDRESS', '15 Trinity Square, South Woodham Ferrers, Chelmsford CM3 5JX'),
 

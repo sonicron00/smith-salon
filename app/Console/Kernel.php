@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('appointments:send-reminders')->everyFiveMinutes();
+        $schedule->command('reviews:refresh')->hourly();
     }
 
     protected function commands(): void
