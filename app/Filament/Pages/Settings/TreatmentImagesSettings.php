@@ -20,9 +20,10 @@ class TreatmentImagesSettings extends Page
 
     public function mount(): void
     {
+        // Don't load blobs into form state — just show current status
         $this->state = [
-            'image_one' => Setting::get('treatments.image_one'),
-            'image_two' => Setting::get('treatments.image_two'),
+            'image_one' => null,
+            'image_two' => null,
         ];
     }
 
@@ -32,20 +33,22 @@ class TreatmentImagesSettings extends Page
             FileUpload::make('image_one')
                 ->label('Photo 1 (left)')
                 ->image()
-                ->directory('treatments')
-                ->disk('public')
-                ->imageEditor()
+                ->disk('local')
+                ->directory('tmp-uploads')
                 ->maxSize(5120)
-                ->helperText('Shown on the left of the Treatments page.'),
+                ->helperText(fn () => Setting::get('treatments.image_one')
+                    ? 'Currently uploaded — upload a new file to replace it.'
+                    : 'No photo uploaded yet.'),
 
             FileUpload::make('image_two')
                 ->label('Photo 2 (right)')
                 ->image()
-                ->directory('treatments')
-                ->disk('public')
-                ->imageEditor()
+                ->disk('local')
+                ->directory('tmp-uploads')
                 ->maxSize(5120)
-                ->helperText('Shown on the right of the Treatments page.'),
+                ->helperText(fn () => Setting::get('treatments.image_two')
+                    ? 'Currently uploaded — upload a new file to replace it.'
+                    : 'No photo uploaded yet.'),
         ])->statePath('state');
     }
 
@@ -55,23 +58,42 @@ class TreatmentImagesSettings extends Page
             Action::make('save')
                 ->label('Save')
                 ->action(function () {
-                    Setting::put('treatments.image_one', $this->normalisePath($this->state['image_one'] ?? null));
-                    Setting::put('treatments.image_two', $this->normalisePath($this->state['image_two'] ?? null));
-                    Notification::make()->title('Saved')->success()->send();
+                    $this->saveImage('image_one', 'treatments.image_one');
+                    $this->saveImage('image_two', 'treatments.image_two');
+                    Notification::make()->title('Photos saved')->success()->send();
                 }),
         ];
     }
 
-    /**
-     * Filament FileUpload state can be an array (temp uploads) or a string (existing path).
-     * Normalise to a single stored path string.
-     */
-    private function normalisePath($value): ?string
+    private function saveImage(string $field, string $settingKey): void
     {
-        if (is_array($value)) {
-            $value = reset($value) ?: null;
+        $path = $this->state[$field] ?? null;
+
+        if (is_array($path)) {
+            $path = reset($path) ?: null;
         }
 
-        return $value ?: null;
+        if (! $path) {
+            return; // No new file uploaded — keep existing
+        }
+
+        $fullPath = storage_path('app/local/tmp-uploads/' . basename($path));
+
+        if (! file_exists($fullPath)) {
+            $fullPath = storage_path('app/tmp-uploads/' . basename($path));
+        }
+
+        if (! file_exists($fullPath)) {
+            return;
+        }
+
+        $mime = mime_content_type($fullPath);
+        $base64 = base64_encode(file_get_contents($fullPath));
+        $dataUri = "data:{$mime};base64,{$base64}";
+
+        Setting::put($settingKey, $dataUri);
+
+        // Clean up temp file
+        @unlink($fullPath);
     }
 }

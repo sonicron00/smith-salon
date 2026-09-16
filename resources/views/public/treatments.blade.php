@@ -34,27 +34,23 @@
         </div>
 
         @php
-            $treatmentImageOne = $imageOne
-                ? \Illuminate\Support\Facades\Storage::disk('public')->url($imageOne)
-                : asset('images/bed.jpg');
-            $treatmentImageTwo = $imageTwo
-                ? \Illuminate\Support\Facades\Storage::disk('public')->url($imageTwo)
-                : asset('images/tap.jpg');
+            $treatmentImageOne = $imageOne ?: asset('images/bed.jpg');
+            $treatmentImageTwo = $imageTwo ?: asset('images/tap.jpg');
         @endphp
 
         <div class="grid gap-4 sm:grid-cols-2">
-            <div class="overflow-hidden rounded-[1.75rem] border border-rose-100 bg-white shadow-sm">
+            <div class="overflow-hidden rounded-[1.75rem]">
                 <img
                     src="{{ $treatmentImageOne }}"
                     alt="Our salon"
-                    class="w-full rounded-[1.75rem]"
+                    class="h-72 w-full rounded-[1.75rem] object-cover sm:h-80"
                 />
             </div>
-            <div class="overflow-hidden rounded-[1.75rem] border border-rose-100 bg-white shadow-sm">
+            <div class="overflow-hidden rounded-[1.75rem]">
                 <img
                     src="{{ $treatmentImageTwo }}"
                     alt="Our salon"
-                    class="w-full rounded-[1.75rem]"
+                    class="h-72 w-full rounded-[1.75rem] object-cover sm:h-80"
                 />
             </div>
         </div>
