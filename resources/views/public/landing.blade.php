@@ -13,7 +13,7 @@
                 </p>
                 <div class="mt-6 flex flex-wrap gap-3">
                     <a href="{{ route('booking.start') }}" class="inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-900 transition hover:bg-rose-50">Start booking</a>
-                    <a href="{{ route('about') }}" class="inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-900 transition hover:bg-rose-50">About us</a>
+                    <a href="{{ route('treatments') }}" class="inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-900 transition hover:bg-rose-50">Treatments</a>
                 </div>
             </div>
 

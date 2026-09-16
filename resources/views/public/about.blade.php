@@ -17,7 +17,7 @@
                 </p>
 
                 <p>
-                    Nicola specialises in luxury head spa treatments and is now trained in Korean face and head massage.
+                    Nicola specialises in luxury head spa treatments.
                 </p>
 
                 <p>

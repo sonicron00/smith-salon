@@ -11,7 +11,7 @@
     <header class="sticky top-0 z-20 border-b border-rose-100/80 backdrop-blur">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-1 sm:px-6">
             <a href="{{ route('landing') }}" class="flex items-center gap-3">
-                <img src="{{ asset('images/logo2.png') }}" alt="{{ config('app.name') }}" class="h-28 w-auto sm:h-32" />
+                <img src="{{ asset('images/logo2.png') }}" alt="{{ config('app.name') }}" class="h-[140px] w-auto sm:h-[160px]" />
             </a>
 
             <nav class="flex items-center gap-6 text-base font-semibold tracking-wide text-[#5a3c3a] sm:gap-8">
@@ -23,6 +23,11 @@
                 <a href="{{ route('about') }}"
                    class="relative transition duration-200 hover:text-[#c6a268] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-[#c6a268] after:transition-all after:duration-300 hover:after:w-full">
                     About Us
+                </a>
+
+                <a href="{{ route('treatments') }}"
+                   class="relative transition duration-200 hover:text-[#c6a268] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-[#c6a268] after:transition-all after:duration-300 hover:after:w-full">
+                    Treatments
                 </a>
 
                 <a href="{{ route('booking.start') }}"

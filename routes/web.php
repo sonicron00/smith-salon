@@ -5,9 +5,11 @@ use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\BookingController;
 use App\Http\Controllers\Public\ManageAppointmentController;
 use App\Http\Controllers\Public\AboutController;
+use App\Http\Controllers\Public\TreatmentsController;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
+Route::get('/treatments', [TreatmentsController::class, 'index'])->name('treatments');
 
 Route::prefix('book')->group(function () {
     Route::get('/', [BookingController::class, 'start'])->name('booking.start');
