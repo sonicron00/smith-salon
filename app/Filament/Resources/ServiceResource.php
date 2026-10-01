@@ -23,6 +23,21 @@ class ServiceResource extends Resource
                 ->required()
                 ->maxLength(255),
 
+            Forms\Components\RichEditor::make('description')
+                ->label('Description')
+                ->helperText('Shown on the public Treatments page')
+                ->toolbarButtons([
+                    'bold',
+                    'italic',
+                    'bulletList',
+                    'orderedList',
+                    'link',
+                    'h3',
+                    'redo',
+                    'undo',
+                ])
+                ->columnSpanFull(),
+
             Forms\Components\CheckboxList::make('staff')
                 ->relationship('staff', 'name')
                 ->columns(2)
