@@ -9,6 +9,49 @@ use Twilio\Rest\Client;
 class SalonNotifications
 {
     /**
+     * Build the "new booking" message, including a non-mobile warning
+     * and the customer's optional message when present.
+     */
+    private static function buildCreatedMessage(Appointment $appointment): string
+    {
+        $message = sprintf(
+            'New booking: %s for %s with %s on %s at %s',
+            $appointment->customer_name,
+            $appointment->service?->name,
+            $appointment->staff?->name,
+            $appointment->starts_at->format('D j M'),
+            $appointment->starts_at->format('H:i'),
+        );
+
+        $message .= "\nPhone: " . $appointment->customer_phone;
+
+        if (! self::isMobile($appointment->customer_phone)) {
+            $message .= "\n⚠️ Not a mobile number - call to confirm and send consultation form.";
+        }
+
+        if (! empty($appointment->customer_message)) {
+            $message .= "\nMessage: " . $appointment->customer_message;
+        }
+
+        return $message;
+    }
+
+    /**
+     * Rough check for a UK mobile number in E.164 form (+447...) or local (07...).
+     */
+    private static function isMobile(?string $phone): bool
+    {
+        if (! $phone) {
+            return false;
+        }
+
+        $digits = preg_replace('/[\s\-\(\)]+/', '', $phone);
+
+        // +447xxxxxxxxx, 447xxxxxxxxx, or 07xxxxxxxxx
+        return (bool) preg_match('/^(\+?447\d{9}|07\d{9})$/', $digits);
+    }
+
+    /**
      * Send an SMS notification to the salon owner when a booking is modified.
      */
     public static function smsSalon(Appointment $appointment, string $action): void
@@ -23,14 +66,7 @@ class SalonNotifications
         $appointment->loadMissing(['service', 'staff']);
 
         $message = match ($action) {
-            'created' => sprintf(
-                'New booking: %s for %s with %s on %s at %s',
-                $appointment->customer_name,
-                $appointment->service?->name,
-                $appointment->staff?->name,
-                $appointment->starts_at->format('D j M'),
-                $appointment->starts_at->format('H:i'),
-            ),
+            'created' => self::buildCreatedMessage($appointment),
             'cancelled' => sprintf(
                 'Cancelled: %s\'s %s appointment on %s at %s',
                 $appointment->customer_name,
