@@ -96,7 +96,13 @@
                     >
                         @foreach ($googleReviews['reviews'] as $index => $review)
                             <div class="w-full shrink-0 px-2 sm:w-1/2 lg:w-1/3">
-                                <div class="flex h-full flex-col rounded-[1.25rem] border border-rose-100 bg-stone-50 p-3">
+                                <a
+                                    href="{{ $googleReviews['maps_uri'] }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="flex h-full flex-col rounded-[1.25rem] border border-rose-100 bg-stone-50 p-3 transition hover:border-rose-300 hover:bg-rose-50"
+                                    title="Read our reviews on Google"
+                                >
                                     <div class="flex items-center gap-2">
                                         @if ($review['author_photo'])
                                             <img src="{{ $review['author_photo'] }}" alt="{{ $review['author'] }}" class="h-7 w-7 rounded-full" referrerpolicy="no-referrer" />
@@ -113,7 +119,8 @@
                                         </div>
                                     </div>
                                     <p class="mt-2 line-clamp-3 text-xs leading-5 text-stone-700">{{ $review['text'] }}</p>
-                                </div>
+                                    <span class="mt-2 text-[10px] font-medium text-rose-600">Read full review →</span>
+                                </a>
                             </div>
                         @endforeach
                     </div>
