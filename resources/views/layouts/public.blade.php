@@ -81,6 +81,12 @@
             </div>
             <div>{{ config('salon.address') }}</div>
         </div>
+
+        <div class="mx-auto max-w-6xl px-4 pb-4 text-right sm:px-6">
+            <a href="mailto:ryzeynz@gmail.com" class="text-xs text-stone-400 transition hover:text-stone-600">
+                Powered by Sonicron Software
+            </a>
+        </div>
     </footer>
 </body>
 </html>

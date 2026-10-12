@@ -22,45 +22,14 @@ class GoogleReviewsService
             return null;
         }
 
-        // The Places API only returns 5 reviews per call, and defaults to "most relevant"
-        // which tends to be the same 5 each time. Fetching both sort orders lets us
-        // accumulate a wider set over repeated runs via the upsert.
-        $seenIds = [];
-        $total = 0;
-
-        foreach (['RELEVANCE', 'NEWEST'] as $sort) {
-            $result = $this->fetchAndStore($apiKey, $placeId, $sort, $seenIds);
-
-            if ($result === null) {
-                // If the first call fails outright, bail; otherwise keep what we got
-                if ($sort === 'RELEVANCE') {
-                    return null;
-                }
-                continue;
-            }
-
-            $total += $result;
-        }
-
-        return $total;
-    }
-
-    /**
-     * Fetch one page of reviews with the given sort order and upsert them.
-     * Tracks already-seen external IDs to avoid double counting across sort orders.
-     */
-    private function fetchAndStore(string $apiKey, string $placeId, string $sort, array &$seenIds): ?int
-    {
         try {
             $response = Http::withHeaders([
                 'X-Goog-Api-Key' => $apiKey,
                 'X-Goog-FieldMask' => 'displayName,rating,userRatingCount,reviews,googleMapsUri',
-            ])->get("https://places.googleapis.com/v1/places/{$placeId}", [
-                'reviews_sort' => $sort,
-            ]);
+            ])->get("https://places.googleapis.com/v1/places/{$placeId}");
 
             if ($response->failed()) {
-                Log::error("GoogleReviewsService: API request failed (sort={$sort}). " . $response->body());
+                Log::error('GoogleReviewsService: API request failed. ' . $response->body());
                 return null;
             }
 
@@ -78,11 +47,6 @@ class GoogleReviewsService
                 $externalId = $review['name'] ?? md5(
                     ($review['authorAttribution']['displayName'] ?? '') . $text
                 );
-
-                if (in_array($externalId, $seenIds, true)) {
-                    continue; // already processed in another sort order this run
-                }
-                $seenIds[] = $externalId;
 
                 Review::updateOrCreate(
                     [
@@ -104,7 +68,7 @@ class GoogleReviewsService
 
             return $count;
         } catch (\Throwable $e) {
-            Log::error("GoogleReviewsService (sort={$sort}): " . $e->getMessage());
+            Log::error('GoogleReviewsService: ' . $e->getMessage());
             report($e);
             return null;
         }
@@ -117,8 +81,8 @@ class GoogleReviewsService
     {
         $reviews = Review::query()
             ->visible()
-            ->where('source', 'google')
             ->orderByDesc('reviewed_at')
+            ->orderByDesc('created_at')
             ->get();
 
         $placeId = config('salon.google_place_id');
