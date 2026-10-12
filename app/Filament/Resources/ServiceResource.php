@@ -65,6 +65,20 @@ class ServiceResource extends Resource
             Forms\Components\Toggle::make('active')
                 ->default(true),
 
+            Forms\Components\Toggle::make('is_addon')
+                ->label('This is an add-on')
+                ->helperText('Add-ons cannot be booked on their own — they are offered as extras when booking another treatment.')
+                ->live()
+                ->default(false),
+
+            Forms\Components\Select::make('addons')
+                ->label('Available add-ons')
+                ->helperText('Add-ons customers can add when booking this treatment')
+                ->relationship('addons', 'name', fn ($query) => $query->where('is_addon', true))
+                ->multiple()
+                ->preload()
+                ->visible(fn (Forms\Get $get) => ! $get('is_addon')),
+
             Forms\Components\Select::make('consultation_form_id')
                 ->relationship('consultationForm', 'name')
                 ->label('Consultation form')
@@ -89,6 +103,10 @@ class ServiceResource extends Resource
                 Tables\Columns\TextColumn::make('duration_minutes')
                     ->label('Duration')
                     ->sortable(),
+
+                Tables\Columns\IconColumn::make('is_addon')
+                    ->label('Add-on')
+                    ->boolean(),
 
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),

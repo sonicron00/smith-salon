@@ -6,6 +6,9 @@
     <h1 class="mt-4 text-3xl font-semibold text-stone-900">Booked!</h1>
     <p class="mt-3 text-sm leading-7 text-stone-600 sm:text-base">
         {{ $appointment->service->name }} with {{ $appointment->staff->name }}<br/>
+        @if ($appointment->addons->isNotEmpty())
+            <span class="text-sm text-stone-600">Add-ons: {{ $appointment->addons->pluck('name')->implode(', ') }}</span><br/>
+        @endif
         <span class="font-semibold text-stone-900">{{ $appointment->starts_at->format('D j M Y \a\t H:i') }}</span>
     </p>
 

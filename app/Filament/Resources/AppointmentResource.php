@@ -77,6 +77,12 @@ class AppointmentResource extends Resource
                     ->label('Service')
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('addons.name')
+                    ->label('Add-ons')
+                    ->badge()
+                    ->separator(',')
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('staff.name')
                     ->label('Staff')
                     ->searchable(),

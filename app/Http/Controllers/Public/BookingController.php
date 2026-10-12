@@ -21,6 +21,7 @@ class BookingController extends Controller
     {
         $services = Service::query()
             ->where('active', true)
+            ->where('is_addon', false)
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -75,7 +76,19 @@ class BookingController extends Controller
             $monthStart = CarbonImmutable::parse($month . '-01')->startOfMonth();
         }
 
-        $slots = $slotService->availableSlots($service, $staff, $date);
+        // Load this service's available add-ons and work out selected ones
+        $addons = $service->addons()->where('active', true)->orderBy('name')->get();
+
+        $selectedAddonIds = collect((array) $request->query('addons', []))
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $addons->contains('id', $id))
+            ->values();
+
+        $extraMinutes = (int) $addons
+            ->whereIn('id', $selectedAddonIds)
+            ->sum('duration_minutes');
+
+        $slots = $slotService->availableSlots($service, $staff, $date, null, $extraMinutes);
 
         $slotGroups = [
             'AM' => array_values(array_filter($slots, fn (string $time) => (int) substr($time, 0, 2) < 12)),
@@ -108,6 +121,9 @@ class BookingController extends Controller
             'slotGroups',
             'calendar',
             'nextAvailableSlot',
+            'addons',
+            'selectedAddonIds',
+            'extraMinutes',
         ));
     }
 
@@ -122,6 +138,8 @@ class BookingController extends Controller
             'customer_phone' => ['required', 'string', 'max:32'],
             'customer_email' => ['nullable', 'email', 'max:255'],
             'customer_message' => ['nullable', 'string', 'max:2000'],
+            'addons' => ['nullable', 'array'],
+            'addons.*' => ['integer', 'exists:services,id'],
         ]);
 
         $service = Service::findOrFail($validated['service_id']);
@@ -134,7 +152,15 @@ class BookingController extends Controller
             abort(404);
         }
 
-        $availableSlots = $slotService->availableSlots($service, $staff, $validated['date']);
+        // Only accept add-ons that are actually offered for this service
+        $allowedAddonIds = $service->addons()->where('is_addon', true)->pluck('services.id');
+        $selectedAddons = Service::query()
+            ->whereIn('id', collect($validated['addons'] ?? [])->intersect($allowedAddonIds))
+            ->get();
+
+        $extraMinutes = (int) $selectedAddons->sum('duration_minutes');
+
+        $availableSlots = $slotService->availableSlots($service, $staff, $validated['date'], null, $extraMinutes);
 
         if (! in_array($validated['time'], $availableSlots, true)) {
             return back()
@@ -142,9 +168,9 @@ class BookingController extends Controller
                 ->withInput();
         }
 
-        [$startsAt, $endsAt] = $slotService->slotToRange($service, $validated['date'], $validated['time']);
+        [$startsAt, $endsAt] = $slotService->slotToRange($service, $validated['date'], $validated['time'], $extraMinutes);
 
-        $appointment = DB::transaction(function () use ($service, $staff, $validated, $startsAt, $endsAt) {
+        $appointment = DB::transaction(function () use ($service, $staff, $validated, $startsAt, $endsAt, $selectedAddons) {
             $conflict = Appointment::query()
                 ->where('staff_id', $staff->id)
                 ->where('status', Appointment::STATUS_BOOKED)
@@ -163,7 +189,7 @@ class BookingController extends Controller
                 $validated['customer_email'] ?? null,
             );
 
-            return Appointment::create([
+            $appointment = Appointment::create([
                 'staff_id' => $staff->id,
                 'service_id' => $service->id,
                 'customer_id' => $customer->id,
@@ -176,6 +202,12 @@ class BookingController extends Controller
                 'status' => Appointment::STATUS_BOOKED,
                 'manage_token' => Str::random(48),
             ]);
+
+            if ($selectedAddons->isNotEmpty()) {
+                $appointment->addons()->sync($selectedAddons->pluck('id')->all());
+            }
+
+            return $appointment;
         });
 
         try {

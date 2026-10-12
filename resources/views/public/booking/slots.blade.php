@@ -85,6 +85,9 @@
 
         <form class="mt-4" method="get" id="date-form">
             <input type="hidden" name="month" value="{{ $calendar['month'] }}" />
+            @foreach ($selectedAddonIds as $addonId)
+                <input type="hidden" name="addons[]" value="{{ $addonId }}" />
+            @endforeach
 
             <label class="text-sm font-medium text-stone-700">Or choose a date manually</label>
             <input
@@ -97,6 +100,41 @@
                     onchange="this.form.submit()"
             />
         </form>
+
+        @if ($addons->isNotEmpty())
+            <section class="mt-6 rounded-[1.5rem] border border-rose-100 bg-stone-50 p-4">
+                <h2 class="text-sm font-semibold uppercase tracking-[0.25em] text-rose-700">Add-ons</h2>
+                <p class="mt-1 text-xs text-stone-500">Optional extras. Selecting an add-on may change the times available.</p>
+
+                <form method="get" id="addons-form" class="mt-3 space-y-2">
+                    <input type="hidden" name="month" value="{{ $calendar['month'] }}" />
+                    <input type="hidden" name="date" value="{{ $date }}" />
+
+                    @foreach ($addons as $addon)
+                        <label class="flex items-center justify-between gap-3 rounded-xl border border-rose-100 bg-white px-3 py-2">
+                            <span class="flex items-center gap-2 text-sm text-stone-800">
+                                <input
+                                    type="checkbox"
+                                    name="addons[]"
+                                    value="{{ $addon->id }}"
+                                    @checked($selectedAddonIds->contains($addon->id))
+                                    onchange="document.getElementById('addons-form').submit()"
+                                />
+                                {{ $addon->name }}
+                                <span class="text-xs text-stone-500">(+{{ $addon->duration_minutes }} mins)</span>
+                            </span>
+                            <span class="text-sm font-semibold text-stone-900">
+                                £{{ number_format(($addon->price_pence ?? 0) / 100, 2) }}
+                            </span>
+                        </label>
+                    @endforeach
+                </form>
+
+                @if ($extraMinutes > 0)
+                    <p class="mt-2 text-xs text-stone-600">Total appointment length: {{ $service->duration_minutes + $extraMinutes }} mins</p>
+                @endif
+            </section>
+        @endif
 
         <div class="mt-6">
             @if (empty($slots))
@@ -164,6 +202,9 @@
                     <input type="hidden" name="staff_id" value="{{ $staff->id }}" />
                     <input type="hidden" name="date" value="{{ $date }}" />
                     <input id="time" type="hidden" name="time" value="{{ old('time') }}" />
+                    @foreach ($selectedAddonIds as $addonId)
+                        <input type="hidden" name="addons[]" value="{{ $addonId }}" />
+                    @endforeach
 
                     <div>
                         <label class="text-sm font-medium text-stone-700">Name</label>

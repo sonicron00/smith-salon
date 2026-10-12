@@ -61,6 +61,11 @@ class Appointment extends Model
         return $this->hasOne(ConsultationResponse::class);
     }
 
+    public function addons(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'appointment_addon', 'appointment_id', 'addon_id');
+    }
+
     public function routeNotificationForTwilio(): string
     {
         return $this->customer_phone;

@@ -21,9 +21,10 @@ class ManageAppointmentController extends Controller
 
         $canModify = $appointment->canModify($cutoffHours);
 
-        // slots for reschedule UI (same staff/service/day by default)
+        // slots for reschedule UI (same staff/service/day by default), accounting for any add-ons
         $date = $request->query('date') ?: $appointment->starts_at->toDateString();
-        $slots = $slotService->availableSlots($appointment->service, $appointment->staff, $date, ignoreAppointmentId: $appointment->id);
+        $extraMinutes = (int) $appointment->addons()->sum('duration_minutes');
+        $slots = $slotService->availableSlots($appointment->service, $appointment->staff, $date, ignoreAppointmentId: $appointment->id, extraMinutes: $extraMinutes);
 
         return view('public.manage.show', compact('appointment', 'cancellationPolicyHtml', 'cutoffHours', 'canModify', 'date', 'slots'));
     }
@@ -57,7 +58,9 @@ class ManageAppointmentController extends Controller
             'time' => ['required', 'date_format:H:i'],
         ]);
 
-        [$startsAt, $endsAt] = $slotService->slotToRange($appointment->service, $validated['date'], $validated['time']);
+        $extraMinutes = (int) $appointment->addons()->sum('duration_minutes');
+
+        [$startsAt, $endsAt] = $slotService->slotToRange($appointment->service, $validated['date'], $validated['time'], $extraMinutes);
 
         DB::transaction(function () use ($appointment, $startsAt, $endsAt) {
             $conflict = Appointment::query()

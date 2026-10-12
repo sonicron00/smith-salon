@@ -23,6 +23,11 @@ class SalonNotifications
             $appointment->starts_at->format('H:i'),
         );
 
+        $addons = $appointment->addons()->pluck('name');
+        if ($addons->isNotEmpty()) {
+            $message .= "\nAdd-ons: " . $addons->implode(', ');
+        }
+
         $message .= "\nPhone: " . $appointment->customer_phone;
 
         if (! self::isMobile($appointment->customer_phone)) {

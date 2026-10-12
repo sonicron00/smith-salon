@@ -22,7 +22,7 @@ class SlotService
      * Return available slot start times, e.g. ["10:00", "10:30"].
      * Uses 30-minute granularity (on the hour and half hour).
      */
-    public function availableSlots(Service $service, Staff $staff, string $date, ?int $ignoreAppointmentId = null): array
+    public function availableSlots(Service $service, Staff $staff, string $date, ?int $ignoreAppointmentId = null, int $extraMinutes = 0): array
     {
         $day = CarbonImmutable::parse($date)->startOfDay();
         $now = CarbonImmutable::now();
@@ -49,7 +49,7 @@ class SlotService
         $start = $day->setTimeFromTimeString($hours->start_time);
         $end = $day->setTimeFromTimeString($hours->end_time);
 
-        $duration = (int) $service->duration_minutes;
+        $duration = (int) $service->duration_minutes + max(0, $extraMinutes);
         $buffer = (int) ($service->buffer_minutes ?? 0);
 
         $timeOff = $staff->timeOff()
@@ -123,11 +123,11 @@ class SlotService
         return $slots;
     }
 
-    public function slotToRange(Service $service, string $date, string $time): array
+    public function slotToRange(Service $service, string $date, string $time, int $extraMinutes = 0): array
     {
         $start = CarbonImmutable::parse($date . ' ' . $time);
         $start = $this->ceilToHalfHour($start);
-        $end = $start->addMinutes((int) $service->duration_minutes);
+        $end = $start->addMinutes((int) $service->duration_minutes + max(0, $extraMinutes));
 
         return [$start, $end];
     }
