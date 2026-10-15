@@ -9,6 +9,8 @@ return [
     'google_api_key' => env('GOOGLE_API_KEY'),
     'google_place_id' => env('GOOGLE_PLACE_ID'),
 
+    'mouseflow_website_id' => env('MOUSEFLOW_WEBSITE_ID'),
+
     // Confirm this address with the client if needed.
     'address' => env('SALON_ADDRESS', '15 Trinity Square, South Woodham Ferrers, Chelmsford CM3 5JX'),
 

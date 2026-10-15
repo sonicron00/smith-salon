@@ -6,6 +6,18 @@
     <title>{{ config('app.name', 'Jewel Beauty & Head Spa') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    @if ($mouseflowId = config('salon.mouseflow_website_id'))
+        <script>
+            window._mfq = window._mfq || [];
+            (function () {
+                var mf = document.createElement("script");
+                mf.type = "text/javascript"; mf.defer = true;
+                mf.src = "//cdn.mouseflow.com/projects/{{ $mouseflowId }}.js";
+                document.getElementsByTagName("head")[0].appendChild(mf);
+            })();
+        </script>
+    @endif
 </head>
 <body class="min-h-screen bg-stone-50 text-stone-900">
     <header class="sticky top-0 z-20 border-b border-rose-100/80 backdrop-blur">
