@@ -19,17 +19,9 @@ return [
             'prefix' => '',
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_merge(
-                array_filter([
-                    PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                ]),
-                // Force the driver to initiate an SSL connection when the server
-                // requires secure transport (e.g. ProxySQL "SSL is required").
-                // Only enabled when DB_SSL=true so local non-SSL dev is unaffected.
-                env('DB_SSL', false) ? [
-                    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => (bool) env('DB_SSL_VERIFY', false),
-                ] : []
-            ) : [],
+     'options' => extension_loaded('pdo_mysql') ? array_filter([
+    \PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+]) : [],
         ],
     ],
     'migrations' => 'migrations',
